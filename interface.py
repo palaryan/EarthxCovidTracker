@@ -22,8 +22,12 @@ class Interface():
         for coord in coords:
             if ((coord[0] - h) ** 2 + (coord[1] - k) ** 2 <= radius ** 2):
                 distance = math.sqrt((coord[1] - k) ** 2 + (coord[0] - h) ** 2)
-                matched_coords.append({str(coords):str(self.max_intensity - distance)})
-        return matched_coords
+                matched_coords.append([coord[0], coord[1]])
+        if (len(matched_coords) != 0):
+            coord_area = (((6 / 4800 / 60) ** 2)* math.pi)
+            return [matched_coords, (len(matched_coords)/((math.pi * (radius ** 2)) / coord_area)) * 100]
+        else:
+            return "Not Found"
   
         
-
+    

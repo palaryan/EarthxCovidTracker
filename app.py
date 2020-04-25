@@ -9,6 +9,9 @@ def response():
         y = float(request.args.get("y"))
         radius = float(request.args.get("radius"))
         matched_coords = wrapper.grab_nearby_users(x, y, radius)
-        return jsonify({'matched_coords':matched_coords})
+        if matched_coords != "Not Found":
+            return jsonify({'matched_coords':matched_coords[0],'percentage': matched_coords[1]})
+        else:
+            return jsonify({'matched_coords':'empty'})
 app.run(host='0.0.0.0', port='1337')
 
