@@ -32,8 +32,7 @@ def ret_coords():
         
         #matched_coords = wrapper.grab_nearby_users(x, y, radius)
         '''
-        Due to the fact that our team is unable to move around due to current restrictions, we used
-        a set of generated test data that we loaded in our backend. Since this normally isn't 
+        Due to the fact that our team is unable to move around due to current restrictions, we used a set of generated test data that we loaded in our backend. Since this normally isn't 
         persistent data, it has not been integrated within our blockchain
         '''
         if matched_coords != "Not Found":
@@ -50,19 +49,25 @@ def ret_score():
         latbias = float(request.args.get("latbias"))
         longbias = float(request.args.get("longbias"))
         query = str(request.args.get("query"))
-        radius = float(request.args.get("radius"))
-        r = requests.get(f"https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={query}&inputtype=textquery&fields=name,geometry&locationbias=point:{latbias},{longbias}&key=AIzaSyDnOckt5q2ddp-3FIWPiwXXqTl4OmqdPiU").json()
+        query.replace(" ", "+")
+        r = requests.get(f"https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input={query}&inputtype=textquery&fields=name,geometry&locationbias=point:{latbias},{longbias}&key=INSERTAPIKEY").json()
         title = r["candidates"][0]["name"]
         coords = r["candidates"][0]["geometry"]["location"]
-        x = coords['lat']
-        y = coords['lng']
-        ret = wrapper.get_score(x, y, radius)
-        return jsonify({"title":title, "coordinates":{"latitude":x, "longitude":y}, "score":ret})
+        x1 = coords['lat']
+        y1 = coords['lng']
+        x2 = r["candidates"][0]["geometry"]["viewport"]["northeast"]["lat"]
+        y2 = r["candidates"][0]["geometry"]["viewport"]["northeast"]["lng"] 
+        x3 = r["candidates"][0]["geometry"]["viewport"]["southwest"]["lat"]
+        y3 = r["candidates"][0]["geometry"]["viewport"]["southwest"]["lng"]
+        corners = [(x2, y2), (x3, y3)]
+        ret = wrapper.get_score(corners)
+        return jsonify({"title":title, "coordinates":{"latitude":x1, "longitude":y1}, "score":ret})
     else:
         return jsonify("Wrong method")
 @app.route('/time_travel', methods=['GET'])
 def time_travel():
     if request.method == "GET":
+        time.sleep(3)
         coord =  list(json.loads(s.chain[1].transactions).keys())[0]
         print(coord)
         x = float(request.args.get("x"))

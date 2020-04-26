@@ -7,7 +7,7 @@ class Interface():
     def __init__(self):
         self.api_url = "https://api.geospark.co/v1/api"
         self.headers = {'Content-Type':'application/json',
-                'Api-Key': '9b92e9804d3d4991989b85ca2ba07d90'}
+                'Api-Key': 'INSERTAPIKEY'}
         self.max_intensity = 100
         self.f = open("generate", "r")
         self.matched_coords = eval(self.f.readline().strip("\n"))
@@ -31,19 +31,25 @@ class Interface():
             return matched_coords
         else:
             return "Not Found"
-    def get_score(self, h, k, radius):
-        radius /= 4800
-        radius /= 60
+    def get_score(self, corners):
+        x1 = corners[0][0]
+        y1 = corners[0][1]
+        x2 = corners[1][0]
+        y2 = corners[1][1]
+        distance = math.sqrt(((y2 - y1) ** 2) + ((x2 - x1) ** 2))
+        radius = distance / 2
+        loc_area = (radius ** 2) * math.pi
+        matched_coords = self.matched_coords
+        max_occupance = loc_area / (((6 / 4800 / 60) ** 2)* math.pi)
+        score = round(len(matched_coords) / max_occupance)
         #matched_coords = self.grab_nearby_users(h, k, radius)
         '''
-        Due to the fact that our team is unable to move around due to current restrictions, we used
-        a set of generated test data that we loaded in our backend. Since this normally isn't
+        Due to the fact that our team is unable to move around due to current restrictions, we used a set of generated test data that we loaded in our backend. Since this normally isn't
         persistent data, it has not been integrated within our blockchain
         '''
-        matched_coords = self.matched_coords
+
         if (matched_coords != "Not Found"):
-            coord_area = (((6 / 4800 / 60) ** 2)* math.pi)
-            return {'latitude':h, 'longitude':k, 'percentage':((len(matched_coords) - 1)/((math.pi * (radius ** 2)) / coord_area)) * 100}
+            return score
         else:
             return "Not Found"
   

@@ -1,10 +1,20 @@
+import json
 import random
-coords = [[32.821002, -96.802862], [32.820871, -96.802763], [32.820556, -96.802740], [32.820480, -96.803858], [32.821470, -96.802783], [32.821211, -96.802043], [32.821064, -96.802912], [32.821340, -96.801974], [32.820478, -96.802683], [32.819979, -96.802690], [32.821386, -96.802165], [32.821001, -96.801954] ]
-points = []
-for coord in coords:
-    for i in range(random.randrange(1000, 10000)):
-        longitude = coord[1] - (random.randrange(10000, 20000) / 288200)
-        lat = coord[0] - (random.randrange(10000, 20000) / 364000)
-        points.append({'latitude':lat, 'longitude': longitude, 'weight':1})
-print(points)
 
+coords = []
+def gen(top_left, bottom_right, runs):
+    points = []
+    for i in range(runs):
+        points.append({
+            'latitude': round(random.uniform(top_left[0], bottom_right[0]), 8),
+            'longitude': round(random.uniform(top_left[1], bottom_right[1]), 8),
+            'weight': random.randint(20,100)
+            })
+    return points
+
+coords = []
+coords.extend(gen((33.216333, -97.441755),(31.109998, -93.489969), 10000))
+#coords.extend(gen((32.821236, -96.803533),(32.820726, -96.802448), 10000))
+#coords.extend(gen((32.819716, -96.812876),(32.811240, -96.806052), 200))
+#coords.extend(gen((32.824918, -96.842525),(32.796063, -96.827590), 200))
+print(coords)

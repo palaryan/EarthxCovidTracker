@@ -1,2 +1,8 @@
 flask
 requests
+numpy
+scikitlearn
+tensorflow
+math
+json
+random

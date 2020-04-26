@@ -30,7 +30,9 @@ def create_sample_data(num_weeks):
                     base -= 2
                 index += 1
     return data_set
-
+def denormalize(data_set, to_scale):
+    data_set = to_scale.inverse_transform(data_set.reshape(-1, 1))
+    return data_set
 
 def normalize(data_set):
     to_scale = MinMaxScaler(feature_range=(0, 1))
@@ -54,11 +56,14 @@ def transform_data(data_set, k):
         start += 1
     return x, y
 
-
+def normalize(data_set, to_scale):
+    data_set = to_scale.fit_transform(data_set.reshape(-1, 1))
+    return data_set
 def train_and_predict(data, num_hours_looked_at=12, show_results=True):
+    to_scale = MinMaxScaler(feature_range=(0, 1))
     # trains the model, makes a prediction, graphs the results
-    train_data = normalize(data[0:int((np.size(data) * 2) / 3)])
-    test_data = normalize(data[int((np.size(data) * 2) / 3):])
+    train_data = normalize(data[0:int((np.size(data) * 2) / 3)], to_scale)
+    test_data = normalize(data[int((np.size(data) * 2) / 3):], to_scale)
 
     x_train, y_train = transform_data(train_data, num_hours_looked_at)
     x_test, y_test = transform_data(test_data, num_hours_looked_at)
@@ -72,8 +77,8 @@ def train_and_predict(data, num_hours_looked_at=12, show_results=True):
     model.compile(loss="mean_squared_error", optimizer="adam")
     model.fit(x_train, y_train, epochs=50, batch_size=1)
 
-    y_predict = model.predict(x_test)
-
+    y_predict = denormalize(model.predict(x_test), to_scale)
+    y_predict = y_predict.reshape((y_predict.shape[1], y_predict.shape[0]))
     if show_results:
         plot_results(y_predict[0], test_data[0:168])
 
@@ -90,9 +95,3 @@ def plot_results(y_predict, y_test):
     plt.show()
 
 
-#def main():
- #   train_and_predict(create_sample_data(12), num_hours_looked_at=168)
-def main():
-    s = Spotchain()
-if __name__ == "__main__":
-    print(create_sample_data(12))
